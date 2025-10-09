@@ -1,7 +1,6 @@
 import React from 'react';
 import { GAMES, PANTHEON } from '../constants';
 import { Game, God, PantheonInfluenceState, PlayerState } from '../types';
-import PantheonInfluence from './PantheonInfluence';
 import GameSelectionCard from './GameSelectionCard';
 
 interface SanctumProps {
@@ -120,17 +119,6 @@ const Sanctum: React.FC<SanctumProps> = ({ god, playerState, onSelectGame, onNav
         </div>
       </div>
 
-      <div className="mt-12">
-        <PantheonInfluence influence={influence} />
-         <div className="text-center mt-6">
-            <button
-            onClick={onNavigateToWar}
-            className="bg-theme-surface hover:bg-theme-primary/20 border border-theme-border text-theme-primary font-bold py-3 px-8 rounded-lg transition-colors duration-300"
-            >
-            Witness the Divine Conflict
-            </button>
-        </div>
-      </div>
     </div>
   );
 };

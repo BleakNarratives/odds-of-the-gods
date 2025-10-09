@@ -1,6 +1,8 @@
-// types.ts
+// src/types.ts
 
 import React from 'react';
+
+// --- CORE DATA TYPES ---
 
 export type GodId = 'zeus' | 'hades' | 'loki' | 'fortuna' | 'anubis' | 'thoth' | 'janus' | 'hecate' | 'morrigan' | 'aspirant' | 'user_god';
 
@@ -30,14 +32,6 @@ export interface Game {
   godId: GodId | null;
   category: 'DIVINE' | 'MORTAL';
 }
-
-export interface GameComponentProps {
-    god: God;
-    wager: number;
-    onWager: (amount: number) => boolean;
-    onGameResult: (wagered: number, won: number, godId: GodId) => void;
-}
-
 
 export type GamePhase =
   | 'BETTING'
@@ -171,4 +165,14 @@ export interface DevToolsProps {
   isOpen: boolean;
   onClose: () => void;
   actions: DevToolsActions;
+}
+
+
+// --- GAME COMPONENT PROPS ---
+
+export interface GameComponentProps {
+    god: God;
+    wager: number; // Current souls available for display
+    onWager: (amount: number) => boolean; // Attempts to subtract wager, returns success
+    onGameResult: (wagered: number, won: number, godId: GodId) => void; // Finalizes the transaction
 }

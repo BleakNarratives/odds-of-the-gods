@@ -1,8 +1,10 @@
+// src/App.tsx
+
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import PantheonScreen from './components/PantheonScreen';
 import Sanctum from './components/Sanctum';
-import GameScreen from './components/GameScreen'; // Modular GameScreen
+import GameScreen from './components/GameScreen';
 import GodsOfWar from './components/GodsOfWar';
 import ClashOfChampions from './components/ClashOfChampions';
 import Footer from './components/Footer';
@@ -24,7 +26,6 @@ import DivineProvidenceModal from './components/DivineProvidenceModal';
 import Dashboard from './components/Dashboard';
 import DevLog from './components/DevLog';
 import DevTools from './components/DevTools';
-import EquiNexModal from './components/modals/EquiNexModal';
 import { Game, PantheonInfluenceState, PlayerState, God, ThothBoonType, TemporaryBoon, DailyQuest, AscendedGodDetails, ProvidenceEvent, DevLogEntry, DevToolsActions, GodId } from './types';
 import { INITIAL_SOULS, INITIAL_PANTHEON_INFLUENCE, INITIAL_PLAYER_STATE, PANTHEON, GAMES, USER_GOD_TEMPLATE, QUEST_POOL } from './constants';
 import { speechService } from './services/speechService';
@@ -34,6 +35,10 @@ type Screen = 'PANTHEON' | 'SANCTUM' | 'GAME' | 'WAR' | 'MORTAL_GAMES' | 'CLASH'
 
 const DAILY_BLESSING_AMOUNT = 100;
 const ASCENSION_COST = 10000;
+
+// --- Divine Providence Research Parameters ---
+const PROVIDENCE_CRITICAL_LOSS_STREAK = 5;
+const PROVIDENCE_SOUL_POVERTY_THRESHOLD = 0.1; // 10% of peak wealth
 
 // --- State Persistence ---
 const loadGameState = () => {
@@ -73,9 +78,8 @@ function App() {
   
   // Modal States
   const [openModal, setOpenModal] = useState<string | null>(null);
-  const [godToPersonalize, setGodToPersonalize] = useState<God | null>(null);
   const [providenceEvent, setProvidenceEvent] = useState<ProvidenceEvent | null>(null);
-  const [equiNexAlert, setEquiNexAlert] = useState<{ reason: string, targetGodId: GodId } | null>(null);
+  const [godToPersonalize, setGodToPersonalize] = useState<God | null>(null);
   
   const [pantheonInfluence, setPantheonInfluence] = useState<PantheonInfluenceState>(persistedState?.pantheonInfluence ?? INITIAL_PANTHEON_INFLUENCE);
   const [dominantGodId, setDominantGodId] = useState<GodId | null>(null);
@@ -96,14 +100,7 @@ function App() {
     const logMessage = `${message} ${Object.keys(data).length > 0 ? JSON.stringify(data) : ''}`;
     console.log(`[DEV LOG - ${timestamp}] ${logMessage}`);
     setDevLogs(prev => [...prev.slice(-49), { timestamp, message: logMessage }]);
-
-    if (message === 'EQUINEX_ALERT' || message === 'MODMIND_REMINDER') {
-        setEquiNexAlert({ 
-            reason: data.reason, 
-            targetGodId: playerState.currentCultId || 'anubis'
-        });
-    }
-  }, [playerState.currentCultId]);
+  }, []);
   
   // --- Game State Persistence ---
   useEffect(() => {
@@ -410,7 +407,7 @@ function App() {
                 onWager={handleWager}
                 onGameResult={handleGameResult}
                 god={currentGod} 
-                onNavigateToSanctum={handleNavigateToSanctum}
+                onNavigateToSanctum={() => handleNavigateToSanctum()}
             />
         ) : null;
       case 'DASHBOARD':
@@ -447,7 +444,6 @@ function App() {
       <AscensionModal isOpen={openModal === 'ascension'} onClose={() => setOpenModal(null)} onAscend={() => {}} />
       <ArchitectCommuneModal isOpen={openModal === 'architectCommune'} onClose={() => setOpenModal(null)} />
       <DivineProvidenceModal isOpen={openModal === 'providence'} onClose={() => setOpenModal(null)} onClaim={()=>{}} event={providenceEvent} />
-      <EquiNexModal isOpen={!!equiNexAlert} onClose={() => setEquiNexAlert(null)} reason={equiNexAlert?.reason || ''} targetGodId={equiNexAlert?.targetGodId || 'anubis'} />
       
       {isGazeTrackerActive && <GazeTracker onBehaviorLog={logDevEvent} />}
       {isDevLogOpen && <DevLog logs={devLogs} onClose={() => setIsDevLogOpen(false)} onClear={() => setDevLogs([])} />}

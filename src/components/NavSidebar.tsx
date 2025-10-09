@@ -1,6 +1,8 @@
+// src/components/NavSidebar.tsx
+
 import React from 'react';
-import { God } from '../types';
-import { PANTHEON, GAMES } from '../constants';
+import { God, GodId } from '../types';
+import { GAMES } from '../constants';
 import { AspirantIcon } from './icons/MythicIcons';
 
 interface NavSidebarProps {
@@ -16,7 +18,14 @@ interface NavSidebarProps {
 
 const NavSidebar: React.FC<NavSidebarProps> = ({ currentGod, onNavigateToSanctum, onNavigateToPantheon, onNavigateToMortalGames, onNavigateToDashboard, isOpen, onClose, activeScreen }) => {
   const gameForGod = GAMES.find(g => g.godId === currentGod.id);
-  const GodIcon = gameForGod ? gameForGod.Icon : AspirantIcon; // Fallback to a default icon
+  const GodIcon = gameForGod ? gameForGod.Icon : AspirantIcon;
+
+  const colorMap: Record<string, string> = {
+      amber: '#f59e0b', rose: '#f43f5e', slate: '#64748b', green: '#22c55e',
+      yellow: '#facc15', blue: '#3b82f6', red: '#ef4444', indigo: '#6366f1',
+      teal: '#14b8a6', primary: '#fca311', secondary: '#e5e5e5'
+  };
+  const godColorHex = colorMap[currentGod.color] || '#ffffff';
 
   const getLinkClass = (screen: 'SANCTUM' | 'PANTHEON' | 'MORTAL_GAMES' | 'DASHBOARD') => {
     const isActive = (activeScreen === 'GAME' && screen === 'SANCTUM') || 
@@ -33,8 +42,8 @@ const NavSidebar: React.FC<NavSidebarProps> = ({ currentGod, onNavigateToSanctum
   const sidebarContent = (
     <div className="w-64 bg-black/80 backdrop-blur-lg border-r border-amber-500/10 p-4 flex flex-col h-full">
         <div className="text-center mb-6">
-          <div className="w-24 h-24 rounded-full mx-auto p-2 border-2" style={{ borderColor: currentGod.color }}>
-            <GodIcon className="w-full h-full" style={{ color: currentGod.color }} />
+          <div className="w-24 h-24 rounded-full mx-auto p-2 border-2" style={{ borderColor: godColorHex }}>
+            <GodIcon className="w-full h-full" style={{ color: godColorHex }} />
           </div>
           <h3 className="mt-4 text-xl font-bold text-white">{currentGod.name}</h3>
           <p className="text-sm text-slate-400">Your Patron</p>

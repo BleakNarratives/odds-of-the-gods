@@ -1,4 +1,4 @@
-// services/speechService.ts
+// src/services/speechService.ts
 
 import { THOTH_VOICE_NAME } from '../constants';
 
@@ -13,6 +13,7 @@ class SpeechService {
   constructor() {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       this.synth = window.speechSynthesis;
+      // Voices can load asynchronously.
       this.synth.onvoiceschanged = () => this.loadVoices();
       this.loadVoices();
     } else {
@@ -24,15 +25,14 @@ class SpeechService {
     if (!this.synth) return;
     this.voices = this.synth.getVoices();
     
-    // Rigorous voice selection to find a suitable male voice
-    this.thothVoice = this.voices.find(voice => voice.name === THOTH_VOICE_NAME) || 
-                      this.voices.find(voice => voice.lang.startsWith('en-GB') && voice.name.includes('Male') && !voice.default) ||
-                      this.voices.find(voice => voice.lang.startsWith('en-US') && voice.name.includes('Male') && !voice.default) ||
-                      this.voices.find(voice => voice.lang.startsWith('en') && voice.name.includes('Male')) ||
-                      this.voices.find(voice => voice.lang.startsWith('en-GB') && !voice.default) ||
-                      this.voices.find(voice => voice.lang.startsWith('en-GB')) ||
-                      this.voices.find(voice => voice.lang.startsWith('en-US') && voice.name.includes('Male')) ||
-                      this.voices[0] || null;
+    // Refined voice selection logic to find a suitable male voice
+    this.thothVoice = this.voices.find(voice => voice.name === THOTH_VOICE_NAME) || // 1. Exact Name Match
+                      this.voices.find(voice => voice.lang.startsWith('en') && voice.name.includes('Male') && !voice.default) || // 2. Any non-default English male
+                      this.voices.find(voice => voice.lang.startsWith('en-GB') && !voice.default) || // 3. Any non-default British voice
+                      this.voices.find(voice => voice.lang.startsWith('en-GB')) || // 4. Any British voice
+                      this.voices.find(voice => voice.lang.startsWith('en-US') && voice.name.includes('Male')) || // 5. American male
+                      this.voices.find(voice => voice.lang.startsWith('en')) || // 6. Any English voice
+                      this.voices[0] || null; // 7. Absolute fallback
 
     if (this.thothVoice && this.isUnlocked) {
       this.processQueue();
@@ -62,14 +62,17 @@ class SpeechService {
 
   public unlock() {
     if (this.isUnlocked || !this.synth) return;
+    // A blank utterance is a common trick to "unlock" speech on mobile/some browsers.
     const unlockUtterance = new SpeechSynthesisUtterance('');
     this.synth.speak(unlockUtterance);
     this.isUnlocked = true;
-    this.loadVoices();
+    this.loadVoices(); // Try to load voices again after user interaction
   }
 
   public speak(text: string, rate = 0.9, pitch = 0.8) {
-    if (!this.synth) return;
+    if (!this.synth) {
+      return;
+    }
     
     if (this.synth.speaking) {
       this.synth.cancel();

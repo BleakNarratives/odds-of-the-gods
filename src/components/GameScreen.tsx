@@ -1,27 +1,26 @@
-// components/GameScreen.tsx
+// src/components/GameScreen.tsx
 
 import React from 'react';
 import { God, Game, GodId } from '../types';
 import DivinePresence from './DivinePresence';
 
 // Import all game components
-// import ZeusDice from './games/ZeusDice'; // NOTE: File is missing, import commented out to prevent crash.
-import HadesUnderworldRoll from './games/HadesUnderworldRoll';
-import FortunaDice from './games/FortunaDice';
-// import LokiCardFlip from './games/LokiCardFlip'; // NOTE: File is missing, import commented out to prevent crash.
+import ZeusDice from './games/ZeusDice';
+import HadesRoulette from './games/HadesRoulette';
+import LokiCardFlip from './games/LokiCardFlip';
 import AnubisScales from './games/AnubisScales';
 import AnubisJars from './games/AnubisJars';
 import AmmitsGamble from './games/AmmitsGamble';
 
 // Map game IDs to their respective components
 const gameComponents: { [key: string]: React.FC<any> } = {
-    // 'zeus-dice': ZeusDice,
-    'hades-underworld-roll': HadesUnderworldRoll,
-    'fortuna-dice': FortunaDice,
-    // 'loki-flip': LokiCardFlip,
+    'zeus-dice': ZeusDice,
+    'hades-roulette': HadesRoulette,
+    'loki-flip': LokiCardFlip,
     'anubis-scales-new': AnubisScales,
     'anubis-jars-new': AnubisJars,
     'ammits-gamble-new': AmmitsGamble,
+    // 'fortuna-wheel': FortunaWheel, // TODO: Add when created
 };
 
 interface GameScreenProps {
@@ -91,7 +90,6 @@ const GameScreen: React.FC<GameScreenProps> = ({
             <div className="w-full lg:w-3/4">
                 <GameComponent 
                     god={god} 
-                    game={game}
                     wager={souls} 
                     onWager={onWager} 
                     onGameResult={onGameResult} 

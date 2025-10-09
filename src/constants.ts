@@ -1,3 +1,5 @@
+// src/constants.ts
+
 import { Game, God, PantheonInfluenceState, PlayerState, DailyQuest } from './types';
 import {
   AnubisIcon,
@@ -12,9 +14,6 @@ import {
   AnchorIcon,
   CardsIcon,
   AspirantIcon,
-  AmbitionIcon,
-  LegacyIcon,
-  CreativityIcon,
 } from './components/icons/MythicIcons';
 
 export const USER_GOD_TEMPLATE: God = {
@@ -190,15 +189,15 @@ export const GAMES: Game[] = [
   },
   // Hades
   {
-    id: 'hades-underworld-roll', name: "Underworld Roll", Icon: HadesIcon, godId: 'hades', category: 'DIVINE',
-    description: "Challenge Hades with dice carved from bone. A higher roll spares you from the tithe, but a loss is a debt to be paid.",
-    minBet: 10, maxBet: 500, winChance: 0.48, payoutMultiplier: 2, flavorText: "The bones never lie, mortal."
+    id: 'hades-roulette', name: "Hades' Underworld Roulette", Icon: HadesIcon, godId: 'hades', category: 'DIVINE',
+    description: "Cast your lot in the underworld's game of chance. Even or odd, the rivers of Styx turn for all.",
+    minBet: 10, maxBet: 150, winChance: 0.40, payoutMultiplier: 2.2, flavorText: "The bones never lie, mortal."
   },
   // Fortuna
   {
-    id: 'fortuna-dice', name: "Fortuna's Fickle Dice", Icon: FortunaIcon, godId: 'fortuna', category: 'DIVINE',
-    description: "Challenge the goddess of luck herself to a roll of the dice. A higher roll secures her favor and your reward.",
-    minBet: 5, maxBet: 250, winChance: 0.48, payoutMultiplier: 2, flavorText: "Destiny is not written. It is rolled."
+    id: 'fortuna-wheel', name: "Favor of Fortuna", Icon: FortunaIcon, godId: 'fortuna', category: 'DIVINE',
+    description: "Spin the great wheel of fate. Fortune favors the bold, but her whims are ever-changing.",
+    minBet: 5, maxBet: 50, winChance: 0.45, payoutMultiplier: 2, flavorText: "Embrace the chaos of chance."
   },
   // Janus
   {
@@ -215,8 +214,8 @@ export const GAMES: Game[] = [
   // Zeus
   {
     id: 'zeus-dice', name: "Zeus's Dice", Icon: ZeusIcon, godId: 'zeus', category: 'DIVINE',
-    description: "Challenge the King of Olympus to a game of dice. Roll higher to prove your worth and earn a divine payout.",
-    minBet: 20, maxBet: 1000, winChance: 0.48, payoutMultiplier: 2, flavorText: "Only the audacious can wield such power."
+    description: "Challenge the King of Olympus to a game of dice. Roll the target to prove your worth and earn a divine payout.",
+    minBet: 20, maxBet: 200, winChance: 0.16, payoutMultiplier: 5, flavorText: "Only the audacious can wield such power."
   },
   // Hecate
   {
