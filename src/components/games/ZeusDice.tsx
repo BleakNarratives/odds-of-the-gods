@@ -1,122 +1,117 @@
-// src/components/games/ZeusDice.tsx
+
 import React, { useState } from 'react';
-import { GameComponentProps } from '../../types';
+// FIX: Corrected import path for types.
+import { GameComponentProps, Game } from '../../types';
 import { audioService } from '../../services/audioService';
 import GameWrapper from './GameWrapper';
+import WagerSlider from './WagerSlider';
+// FIX: Changed to named import for GameResultAnimation
+import { GameResultAnimation } from './GameResultAnimation';
 
-const ZeusDice: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameResult }) => {
-    const [wagerAmount, setWagerAmount] = useState(100);
-    const [targetRoll, setTargetRoll] = useState<number>(7);
-    const [result, setResult] = useState<{ roll: number, message: string } | null>(null);
-    const [isRolling, setIsRolling] = useState(false);
-    
-    const primaryColor = '#fca311';
-
-    const handleRoll = () => {
-        if (isRolling || wagerAmount > wager) return;
-
-        if (!onWager(wagerAmount)) {
-            setResult({ roll: 0, message: "INSUFFICIENT SOULS" });
-            return;
-        }
-
-        setIsRolling(true);
-        setResult(null);
-        // audioService.play('dice-roll');
-
-        setTimeout(() => {
-            const die1 = Math.floor(Math.random() * 6) + 1;
-            const die2 = Math.floor(Math.random() * 6) + 1;
-            const roll = die1 + die2;
-            let message = '';
-            let multiplier = 0;
-            
-            if (roll === targetRoll) {
-                multiplier = 5;
-                message = `DIVINE HIT! You rolled a ${roll}!`;
-                // audioService.play('jackpot-sound');
-            } else {
-                multiplier = 0;
-                message = `You rolled a ${roll}. Not this time.`;
-                // audioService.play('loss');
-            }
-
-            const winAmount = wagerAmount * multiplier;
-            onGameResult(wagerAmount, winAmount, god.id);
-
-            setResult({ roll, message });
-            setIsRolling(false);
-        }, 2000);
-    };
-
-    const renderDice = (value: number) => (
-        <div className={`w-16 h-16 sm:w-20 sm:h-20 bg-theme-background text-2xl sm:text-4xl flex items-center justify-center rounded-lg shadow-inner-lg`} 
-             style={{ boxShadow: `inset 0 0 15px ${primaryColor}40, 0 4px 15px ${primaryColor}60` }}
-        >
-            <span style={{ color: primaryColor }} className="font-extrabold">{value}</span>
-        </div>
-    );
+const Dice: React.FC<{ value: number, isRolling: boolean }> = ({ value, isRolling }) => {
+    const finalFaceClass = isRolling ? '' : `dice-face-${value}`;
+    const rollingClass = isRolling ? 'rolling' : '';
+    const animationDelay = `-${Math.random() * 0.5}s`;
+    const faceStyle = {background: 'linear-gradient(45deg, #f7fafc, #e2e8f0)', border: '2px solid #d4af37'};
+    const dotStyle = {backgroundColor: '#d4af37', boxShadow: 'inset 0 0 3px #a08020'};
 
     return (
-        <GameWrapper god={god}>
-            <div className="text-center">
-                {/* Game Setup */}
-                <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8 mb-8 p-4 bg-theme-background/70 rounded-lg">
-                    <div className="w-full sm:w-auto">
-                        <label className="block text-theme-muted mb-2">Wager (Souls)</label>
-                        <input
-                            type="number"
-                            min="10"
-                            step="10"
-                            value={wagerAmount}
-                            onChange={(e) => setWagerAmount(Math.max(10, parseInt(e.target.value) || 0))}
-                            className="w-full text-center p-3 rounded-lg bg-theme-surface border-2 border-theme-border focus:border-theme-primary transition duration-300 text-theme-secondary"
-                            style={{ boxShadow: `0 0 10px ${primaryColor}20` }}
-                        />
-                    </div>
-                    <div className="w-full sm:w-auto">
-                        <label className="block text-theme-muted mb-2">Target Roll (Payout: 5x)</label>
-                        <select
-                            value={targetRoll}
-                            onChange={(e) => setTargetRoll(parseInt(e.target.value))}
-                            className="w-full text-center p-3 rounded-lg bg-theme-surface border-2 border-theme-border focus:border-theme-primary transition duration-300 text-theme-secondary"
-                            style={{ boxShadow: `0 0 10px ${primaryColor}20` }}
-                        >
-                            {[3, 4, 5, 6, 7, 8, 9, 10, 11].map(num => (
-                                <option key={num} value={num}>{num}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                <div className={`min-h-[120px] mb-8 flex items-center justify-center space-x-6`}>
-                    {isRolling ? (
-                        <span className="text-2xl animate-pulse" style={{ color: primaryColor }}>Rolling the Fates...</span>
-                    ) : result?.roll ? (
-                        <div className="flex space-x-4 animate-fade-in">
-                            {renderDice(Math.floor(result.roll / 2))} 
-                            {renderDice(result.roll - Math.floor(result.roll / 2))}
-                        </div>
-                    ) : (
-                        <span className="text-theme-muted">Ready to Challenge the Sky</span>
-                    )}
-                </div>
-                
-                {result && (
-                    <div className={`text-xl font-bold p-3 rounded-lg mb-6 ${result.message.includes('INSUFFICIENT') ? 'text-theme-loss bg-theme-loss/20' : result.message.includes('HIT') ? 'text-theme-win bg-theme-win/20' : 'text-theme-muted bg-theme-surface/50'}`} style={{ boxShadow: `0 0 10px ${primaryColor}40` }}>
-                        {result.message}
-                    </div>
-                )}
-
-                <button
-                    onClick={handleRoll}
-                    disabled={isRolling || wagerAmount <= 0 || wagerAmount > wager}
-                    className={`w-full py-4 text-2xl font-extrabold rounded-xl transition duration-300 transform ${isRolling || wagerAmount <= 0 || wagerAmount > wager ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-[0.98] shimmer-button'}`}
-                    style={{ backgroundColor: primaryColor, color: 'var(--color-background)', textShadow: '0 0 5px #000000' }}
-                >
-                    {isRolling ? 'ROLLING...' : `WAGER ${wagerAmount.toLocaleString()} SOULS`}
-                </button>
+        <div className="dice-container">
+            <div className={`dice ${rollingClass} ${finalFaceClass}`} style={isRolling ? { animationDelay } : {}}>
+                <div className="face face-1" style={faceStyle}><span className="dot" style={dotStyle}></span></div>
+                <div className="face face-2" style={faceStyle}><span className="dot" style={dotStyle}></span><span className="dot" style={dotStyle}></span></div>
+                <div className="face face-3" style={faceStyle}><span className="dot" style={dotStyle}></span><span className="dot" style={dotStyle}></span><span className="dot" style={dotStyle}></span></div>
+                <div className="face face-4" style={faceStyle}><div className="column"><span className="dot" style={dotStyle}></span><span className="dot" style={dotStyle}></span></div><div className="column"><span className="dot" style={dotStyle}></span><span className="dot" style={dotStyle}></span></div></div>
+                <div className="face face-5" style={faceStyle}><div className="column"><span className="dot" style={dotStyle}></span><span className="dot" style={dotStyle}></span></div><div className="column"><span className="dot" style={dotStyle}></span></div><div className="column"><span className="dot" style={dotStyle}></span><span className="dot" style={dotStyle}></span></div></div>
+                <div className="face face-6" style={faceStyle}><div className="column"><span className="dot" style={dotStyle}></span><span className="dot" style={dotStyle}></span><span className="dot" style={dotStyle}></span></div><div className="column"><span className="dot" style={dotStyle}></span><span className="dot" style={dotStyle}></span><span className="dot" style={dotStyle}></span></div></div>
             </div>
+        </div>
+    );
+};
+
+
+const ZeusDice: React.FC<GameComponentProps & { game: Game }> = ({ god, game, wager, onWager, onGameResult, playerState, setPlayerState }) => {
+    const [wagerAmount, setWagerAmount] = useState(game.minBet);
+    const [gameState, setGameState] = useState<'betting' | 'rolling' | 'result'>('betting');
+    const [playerRoll, setPlayerRoll] = useState({ d1: 1, d2: 1, total: 2 });
+    const [zeusRoll, setZeusRoll] = useState({ d1: 1, d2: 1, total: 2 });
+    const [winResult, setWinResult] = useState(false);
+    
+    const colorMap: Record<string, string> = { yellow: '#facc15' };
+    const primaryColor = colorMap[god.color] || '#fca311';
+
+    const handleRoll = () => {
+        if (gameState !== 'betting' || wagerAmount > wager) return;
+        audioService.play('click');
+        if (!onWager(wagerAmount)) return;
+
+        setGameState('rolling');
+        audioService.play('dice-roll');
+
+        const p1 = Math.floor(Math.random() * 6) + 1;
+        const p2 = Math.floor(Math.random() * 6) + 1;
+        const z1 = Math.floor(Math.random() * 6) + 1;
+        const z2 = Math.floor(Math.random() * 6) + 1;
+
+        setTimeout(() => {
+            setPlayerRoll({ d1: p1, d2: p2, total: p1 + p2 });
+            setZeusRoll({ d1: z1, d2: z2, total: z1 + z2 });
+            audioService.play('dice-land');
+            
+            const playerWins = (p1 + p2) > (z1 + z2);
+            setWinResult(playerWins);
+            
+            const payout = playerWins ? wagerAmount * game.payoutMultiplier : 0;
+            // FIX: Pass all required arguments to onGameResult
+            onGameResult(wagerAmount, payout, god.id, false, false);
+
+            setTimeout(() => setGameState('result'), 500);
+        }, 2500);
+    };
+
+    const handlePlayAgain = () => {
+        audioService.play('click');
+        setWagerAmount(game.minBet);
+        setGameState('betting');
+    };
+    
+    return (
+        <GameWrapper god={god}>
+             {gameState === 'betting' && (
+                <div className="animate-fade-in text-center flex flex-col items-center justify-center min-h-[300px] space-y-8">
+                    <p className="text-theme-muted max-w-md">{game.description}</p>
+                    <WagerSlider min={game.minBet} max={game.maxBet} value={wagerAmount} onChange={setWagerAmount} souls={wager} color={primaryColor} />
+                    <button
+                        onClick={handleRoll}
+                        disabled={wagerAmount > wager || wager < game.minBet}
+                        className="w-full max-w-sm py-4 text-2xl font-extrabold rounded-xl transition transform disabled:opacity-50 disabled:cursor-not-allowed hover:scale-102 active:scale-98 shimmer-button"
+                        style={{ backgroundColor: primaryColor, color: 'var(--color-background)', textShadow: '0 0 5px #000' }}
+                    >
+                        Challenge Zeus
+                    </button>
+                </div>
+            )}
+
+            {gameState === 'rolling' && (
+                <div className="animate-fade-in flex flex-col items-center justify-center min-h-[300px] space-y-6">
+                     <p className="text-2xl text-theme-muted italic">The heavens tremble as the dice are thrown...</p>
+                     <div className="w-full flex justify-around items-center">
+                        <div className="flex flex-col items-center"><p className="text-lg text-theme-secondary mb-2">Your Roll</p><div className="flex gap-4"><Dice value={1} isRolling={true} /><Dice value={1} isRolling={true} /></div></div>
+                        <div className="flex flex-col items-center"><p className="text-lg text-yellow-400 mb-2">Zeus's Roll</p><div className="flex gap-4"><Dice value={1} isRolling={true} /><Dice value={1} isRolling={true} /></div></div>
+                    </div>
+                </div>
+            )}
+
+            {gameState === 'result' && (
+                <div className="animate-fade-in flex flex-col items-center justify-center min-h-[300px] space-y-6">
+                    <GameResultAnimation isWin={winResult} god={god} payout={wagerAmount * game.payoutMultiplier} onAnimationEnd={() => {}} />
+                     <div className="w-full flex justify-around items-center">
+                        <div className="flex flex-col items-center"><p className="text-lg text-theme-secondary mb-2">Your Roll: {playerRoll.total}</p><div className="flex gap-4"><Dice value={playerRoll.d1} isRolling={false} /><Dice value={playerRoll.d2} isRolling={false} /></div></div>
+                        <div className="flex flex-col items-center"><p className="text-lg text-yellow-400 mb-2">Zeus's Roll: {zeusRoll.total}</p><div className="flex gap-4"><Dice value={zeusRoll.d1} isRolling={false} /><Dice value={zeusRoll.d2} isRolling={false} /></div></div>
+                    </div>
+                    <button onClick={handlePlayAgain} className="w-full max-w-sm py-3 text-xl font-bold rounded-lg shimmer-button" style={{ backgroundColor: primaryColor, color: 'var(--color-background)' }}>Play Again</button>
+                </div>
+            )}
         </GameWrapper>
     );
 };

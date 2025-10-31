@@ -1,10 +1,12 @@
+
 import React, { useState } from 'react';
-import { GameComponentProps } from '../../types';
+// FIX: Corrected import path for types.
+import { GameComponentProps, Game } from '../../types';
 import GameWrapper from './GameWrapper';
 import { audioService } from '../../services/audioService';
 
-const AnubisJars: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameResult }) => {
-    const [wagerAmount, setWagerAmount] = useState(100);
+const AnubisJars: React.FC<GameComponentProps & { game: Game }> = ({ god, game, wager, onWager, onGameResult, playerState, setPlayerState }) => {
+    const [wagerAmount, setWagerAmount] = useState(game.minBet);
     const [jars, setJars] = useState<('win' | 'loss')[]>(['loss', 'loss', 'loss']);
     const [revealed, setRevealed] = useState<boolean[]>([false, false, false]);
     const [resultMessage, setResultMessage] = useState<string>('');
@@ -13,6 +15,7 @@ const AnubisJars: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameR
     const primaryColor = '#2563eb';
 
     const setupNewGame = () => {
+        audioService.play('click');
         const winIndex = Math.floor(Math.random() * 3);
         const newJars: ('win'|'loss')[] = ['loss', 'loss', 'loss'];
         newJars[winIndex] = 'win';
@@ -35,7 +38,8 @@ const AnubisJars: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameR
         const isWin = jars[index] === 'win';
         const winAmount = isWin ? wagerAmount * 3 : 0;
         
-        onGameResult(wagerAmount, winAmount, god.id);
+        // FIX: Add missing arguments
+        onGameResult(wagerAmount, winAmount, god.id, false, false);
 
         setResultMessage(isWin ? `The Heart is Found! You win ${winAmount.toLocaleString()} Souls!` : "An empty vessel. Your offering is lost.");
         setRevealed([true, true, true]);
@@ -44,6 +48,7 @@ const AnubisJars: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameR
     };
 
     const handlePlayAgain = () => {
+        audioService.play('click');
         setGameState('betting');
         setResultMessage('');
     };
@@ -54,11 +59,13 @@ const AnubisJars: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameR
         </svg>
     );
 
+    // FIX: Added return statement with JSX to make this a valid React component.
     return (
         <GameWrapper god={god}>
             <div className="text-center">
                 {gameState === 'betting' && (
                     <div className="animate-fade-in">
+                        <p className="text-theme-muted mb-6">{game.description}</p>
                         <div className="flex justify-center items-center space-x-4 mb-8 p-4 bg-theme-background/70 rounded-lg">
                             <label className="text-theme-muted">Wager (Souls)</label>
                             <input

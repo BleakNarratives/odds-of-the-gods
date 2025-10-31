@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
-import { GameComponentProps } from '../../types';
+// FIX: Corrected import path for types.
+import { GameComponentProps, Game } from '../../types';
 import GameWrapper from './GameWrapper';
 import { audioService } from '../../services/audioService';
 
-const AmmitsGamble: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameResult }) => {
+const AmmitsGamble: React.FC<GameComponentProps & { game: Game }> = ({ god, game, wager, onWager, onGameResult, playerState, setPlayerState }) => {
     const [wagerAmount, setWagerAmount] = useState(100);
     const [virtues, setVirtues] = useState(0);
     const [sins, setSins] = useState(0);
@@ -15,6 +17,7 @@ const AmmitsGamble: React.FC<GameComponentProps> = ({ god, wager, onWager, onGam
 
     const handleStartGame = () => {
         if (wagerAmount > wager) return;
+        audioService.play('click');
         if (!onWager(wagerAmount)) {
             setMessage("INSUFFICIENT SOULS");
             return;
@@ -49,12 +52,14 @@ const AmmitsGamble: React.FC<GameComponentProps> = ({ god, wager, onWager, onGam
 
         if (newVirtues >= 5) {
             const winAmount = wagerAmount * 2.5;
-            onGameResult(wagerAmount, winAmount, god.id);
+            // FIX: Added missing arguments
+            onGameResult(wagerAmount, winAmount, god.id, false, false);
             setMessage(`Five virtues collected! You win ${winAmount.toLocaleString()} souls!`);
             setGameState('ended');
             audioService.play('win');
         } else if (newSins >= 3) {
-            onGameResult(wagerAmount, 0, god.id);
+            // FIX: Added missing arguments
+            onGameResult(wagerAmount, 0, god.id, false, false);
             setMessage('Three sins... Ammit the Devourer claims your wager!');
             setGameState('ended');
             audioService.play('lose');
@@ -62,6 +67,7 @@ const AmmitsGamble: React.FC<GameComponentProps> = ({ god, wager, onWager, onGam
     };
     
     const handlePlayAgain = () => {
+        audioService.play('click');
         setGameState('betting');
         setMessage('');
     };
@@ -71,7 +77,7 @@ const AmmitsGamble: React.FC<GameComponentProps> = ({ god, wager, onWager, onGam
             <div className="text-center">
                 {gameState === 'betting' && (
                     <div className="animate-fade-in">
-                        <p className="text-theme-muted mb-6">Collect five virtues before you roll three sins. Ammit, the Devourer, awaits the outcome.</p>
+                        <p className="text-theme-muted mb-6">{game.description}</p>
                         <div className="flex justify-center items-center space-x-4 mb-8 p-4 bg-theme-background/70 rounded-lg">
                             <label className="text-theme-muted">Wager (Souls)</label>
                             <input

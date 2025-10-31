@@ -1,116 +1,86 @@
-// src/components/games/LokiCardFlip.tsx
-import React, { useState, useEffect } from 'react';
-import { GameComponentProps } from '../../types';
+
+// components/games/LokiCardFlip.tsx
+import React, { useState } from 'react';
+// FIX: Corrected import path for types.
+import { GameComponentProps, Game } from '../../types';
 import { audioService } from '../../services/audioService';
 import GameWrapper from './GameWrapper';
+import WagerSlider from './WagerSlider';
+// FIX: Changed import to named export
+import { GameResultAnimation } from './GameResultAnimation';
+import { LokiShellGameChoice, LokiShellGameAnimation } from '../game-animations/LokiShellGame';
 
-const LokiCardFlip: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameResult }) => {
-    const [wagerAmount, setWagerAmount] = useState(100);
-    const [cards, setCards] = useState<( 'win' | 'loss')[]>(['loss', 'loss', 'loss']);
-    const [revealed, setRevealed] = useState<boolean[]>([false, false, false]);
-    const [resultMessage, setResultMessage] = useState<string>('');
-    const [gameState, setGameState] = useState<'betting' | 'playing' | 'revealed'>('betting');
+
+const LokiCardFlip: React.FC<GameComponentProps & { game: Game }> = ({ god, game, wager, onWager, onGameResult }) => {
+    const [wagerAmount, setWagerAmount] = useState(game.minBet);
+    const [gameState, setGameState] = useState<'betting' | 'choice' | 'shuffling' | 'result'>('betting');
+    const [playerChoice, setPlayerChoice] = useState<number | null>(null);
+    const [winResult, setWinResult] = useState(false);
     
     const primaryColor = '#10b981'; // Loki's Green
 
-    const setupNewGame = () => {
-        const winIndex = Math.floor(Math.random() * 3);
-        const newCards: ('win'|'loss')[] = ['loss', 'loss', 'loss'];
-        newCards[winIndex] = 'win';
-        setCards(newCards);
-        setRevealed([false, false, false]);
-        setResultMessage('');
-        setGameState('playing');
-        audioService.play('shuffle');
+    const handleProceedToChoice = () => {
+        if (wagerAmount > wager) return;
+        if (!onWager(wagerAmount)) return;
+        setGameState('choice');
     };
 
-    const handleCardClick = (index: number) => {
-        if (gameState !== 'playing' || wagerAmount > wager) return;
-
-        if (!onWager(wagerAmount)) {
-            setResultMessage("INSUFFICIENT SOULS TO TEST LOKI'S LUCK");
-            return;
-        }
-
-        audioService.play('click');
-        const isWin = cards[index] === 'win';
-        const winAmount = isWin ? wagerAmount * 3 : 0;
-        
-        onGameResult(wagerAmount, winAmount, god.id);
-
-        setResultMessage(isWin ? `LOKI'S PRIZE! You win ${winAmount.toLocaleString()} Souls!` : "LOKI'S TRICK. A card of shadows.");
-        setRevealed([true, true, true]);
-        setGameState('revealed');
-        // if (isWin) audioService.play('big-win'); else audioService.play('loss');
+    const handleChoice = (choice: number) => {
+        setPlayerChoice(choice);
+        const isWin = Math.random() < game.winChance;
+        setWinResult(isWin);
+        setGameState('shuffling');
+    };
+    
+    const handleAnimationEnd = () => {
+        const payout = winResult ? wagerAmount * game.payoutMultiplier : 0;
+        // FIX: Added missing arguments to onGameResult
+        onGameResult(wagerAmount, payout, god.id, false, false);
+        setGameState('result');
     };
 
     const handlePlayAgain = () => {
         setGameState('betting');
-        setResultMessage('');
+        setPlayerChoice(null);
     };
 
     return (
         <GameWrapper god={god}>
-            <div className="text-center">
+             <div className="flex flex-col items-center justify-center min-h-[300px]">
                 {gameState === 'betting' && (
-                    <div className="animate-fade-in">
-                        <div className="flex justify-center items-center space-x-4 mb-8 p-4 bg-theme-background/70 rounded-lg">
-                            <label className="text-theme-muted">Wager (Souls)</label>
-                            <input
-                                type="number"
-                                min="10"
-                                step="10"
-                                value={wagerAmount}
-                                onChange={(e) => setWagerAmount(Math.max(10, parseInt(e.target.value) || 0))}
-                                className="w-32 text-center p-2 rounded-lg bg-theme-surface border-2 border-theme-border focus:border-theme-primary transition text-theme-secondary"
-                            />
-                        </div>
+                     <div className="animate-fade-in text-center flex flex-col items-center justify-center space-y-8 w-full">
+                        <p className="text-theme-muted max-w-md">{game.description}</p>
+                        <WagerSlider min={game.minBet} max={game.maxBet} value={wagerAmount} onChange={setWagerAmount} souls={wager} color={primaryColor} />
                         <button
-                            onClick={setupNewGame}
-                            disabled={wagerAmount <= 0 || wagerAmount > wager}
-                            className="w-full py-4 text-2xl font-extrabold rounded-xl transition transform disabled:opacity-50 disabled:cursor-not-allowed hover:scale-102 active:scale-98 shimmer-button"
+                            onClick={handleProceedToChoice}
+                            disabled={wagerAmount > wager || wager < game.minBet}
+                            className="w-full max-w-sm py-4 text-2xl font-extrabold rounded-xl transition transform disabled:opacity-50 disabled:cursor-not-allowed hover:scale-102 active:scale-98 shimmer-button"
                             style={{ backgroundColor: primaryColor, color: 'var(--color-background)', textShadow: '0 0 5px #000' }}
                         >
-                            Start Game
+                            Begin the Trick
                         </button>
                     </div>
                 )}
-
-                {gameState !== 'betting' && (
-                    <div className="min-h-[200px] mb-8 flex items-center justify-center space-x-4 sm:space-x-6 animate-fade-in">
-                        {cards.map((card, index) => (
-                            <div
-                                key={index}
-                                onClick={() => handleCardClick(index)}
-                                className={`w-24 h-36 sm:w-32 sm:h-48 rounded-lg flex items-center justify-center font-bold text-xl transition-all duration-500 transform-gpu ${gameState === 'playing' ? 'cursor-pointer hover:scale-105' : ''}`}
-                                style={{
-                                    border: `2px solid ${primaryColor}50`,
-                                    boxShadow: `0 0 15px ${primaryColor}30`,
-                                }}
-                            >
-                                <div className={`w-full h-full rounded-lg flex items-center justify-center text-theme-background ${revealed[index] ? (card === 'win' ? 'bg-theme-win' : 'bg-theme-loss') : 'bg-theme-surface'}`}>
-                                    <span style={{textShadow: '0 1px 3px #000'}}>{revealed[index] ? (card === 'win' ? 'GOLD' : 'SHADOW') : 'LOKI'}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
                 
-                {resultMessage && (
-                    <div className={`text-xl font-bold p-3 rounded-lg mb-6 ${resultMessage.includes('INSUFFICIENT') || resultMessage.includes('TRICK') ? 'text-theme-loss bg-theme-loss/20' : 'text-theme-win bg-theme-win/20'}`}>
-                        {resultMessage}
-                    </div>
+                {gameState === 'choice' && <LokiShellGameChoice onChoice={handleChoice} game={game} />}
+                
+                {gameState === 'shuffling' && playerChoice !== null && (
+                    <LokiShellGameAnimation 
+                        isWin={winResult}
+                        choice={playerChoice}
+                        onAnimationEnd={handleAnimationEnd}
+                        game={game}
+                    />
                 )}
 
-                {gameState === 'revealed' && (
-                    <button
-                        onClick={handlePlayAgain}
-                        className="w-full py-4 text-2xl font-extrabold rounded-xl transition transform hover:scale-102 active:scale-98 shimmer-button"
-                        style={{ backgroundColor: primaryColor, color: 'var(--color-background)', textShadow: '0 0 5px #000' }}
-                    >
-                        Play Again
-                    </button>
+                {gameState === 'result' && (
+                     <div className="animate-fade-in flex flex-col items-center justify-center h-full text-center space-y-4">
+                         <GameResultAnimation isWin={winResult} god={god} payout={wagerAmount * game.payoutMultiplier} onAnimationEnd={() => {}} />
+                         <p className="text-lg text-theme-muted">Loki's trick is revealed.</p>
+                         <button onClick={handlePlayAgain} className="w-full max-w-sm py-3 text-xl font-bold rounded-lg shimmer-button" style={{ backgroundColor: primaryColor, color: 'var(--color-background)' }}>Play Again</button>
+                     </div>
                 )}
+
             </div>
         </GameWrapper>
     );

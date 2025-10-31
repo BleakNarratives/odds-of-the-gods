@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { GameComponentProps } from '../../types';
+// FIX: Corrected import path for types.
+import { GameComponentProps } from '../../src/types';
 import GameWrapper from './GameWrapper';
-import { audioService } from '../../services/audioService';
+import { audioService } from '../../src/services/audioService';
 
 const AnubisScales: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameResult }) => {
     const [wagerAmount, setWagerAmount] = useState(100);
@@ -25,7 +26,8 @@ const AnubisScales: React.FC<GameComponentProps> = ({ god, wager, onWager, onGam
             const isWin = Math.random() < 0.5; // 50% chance
             const winAmount = isWin ? wagerAmount * 2 : 0;
             
-            onGameResult(wagerAmount, winAmount, god.id);
+            // FIX: Added missing arguments for isCheating and wasCaught
+            onGameResult(wagerAmount, winAmount, god.id, false, false);
             setResult(isWin ? 'win' : 'loss');
             
             audioService.stop('suspense');

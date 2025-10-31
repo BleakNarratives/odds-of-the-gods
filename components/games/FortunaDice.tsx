@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { GameComponentProps, Game } from '../../types';
+// FIX: Corrected import path for types.
+import { GameComponentProps, Game } from '../../src/types';
 import GameWrapper from './GameWrapper';
-import { audioService } from '../../services/audioService';
+import { audioService } from '../../src/services/audioService';
 import WagerSlider from './WagerSlider';
-import GameResultAnimation from './GameResultAnimation';
+// FIX: Corrected to named import
+import { GameResultAnimation } from './GameResultAnimation';
 
 const Dice: React.FC<{ value: number, isRolling: boolean }> = ({ value, isRolling }) => {
     const finalFaceClass = isRolling ? '' : `dice-face-${value}`;
@@ -57,7 +59,7 @@ const FortunaDice: React.FC<GameComponentProps & { game: Game }> = ({ god, game,
             setWinResult(playerWins);
 
             const payout = playerWins ? wagerAmount * game.payoutMultiplier : 0;
-            onGameResult(wagerAmount, payout, god.id);
+            onGameResult(wagerAmount, payout, god.id, false, false);
             
             setTimeout(() => setGameState('result'), 500);
         }, 2500);

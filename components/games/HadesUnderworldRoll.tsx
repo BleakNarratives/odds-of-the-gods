@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { GameComponentProps, Game } from '../../types';
+// FIX: Corrected import path for types.
+import { GameComponentProps, Game } from '../../src/types';
 import GameWrapper from './GameWrapper';
-import { audioService } from '../../services/audioService';
+import { audioService } from '../../src/services/audioService';
 import WagerSlider from './WagerSlider';
-import GameResultAnimation from './GameResultAnimation';
+// FIX: Changed to named import for GameResultAnimation
+import { GameResultAnimation } from './GameResultAnimation';
 
 const Dice: React.FC<{ value: number, isRolling: boolean }> = ({ value, isRolling }) => {
     const finalFaceClass = isRolling ? '' : `dice-face-${value}`;
@@ -26,7 +28,7 @@ const Dice: React.FC<{ value: number, isRolling: boolean }> = ({ value, isRollin
     );
 };
 
-const HadesUnderworldRoll: React.FC<GameComponentProps & { game: Game }> = ({ god, game, wager, onWager, onGameResult }) => {
+const HadesUnderworldRoll: React.FC<GameComponentProps & { game: Game }> = ({ god, game, wager, onWager, onGameResult, playerState, setPlayerState }) => {
     const [wagerAmount, setWagerAmount] = useState(game.minBet);
     const [gameState, setGameState] = useState<'betting' | 'rolling' | 'result'>('betting');
     const [playerRoll, setPlayerRoll] = useState({ d1: 1, d2: 1, total: 2 });
@@ -38,6 +40,7 @@ const HadesUnderworldRoll: React.FC<GameComponentProps & { game: Game }> = ({ go
 
     const handleRoll = () => {
         if (gameState !== 'betting' || wagerAmount > wager) return;
+        audioService.play('click');
         if (!onWager(wagerAmount)) return;
 
         setGameState('rolling');
@@ -57,13 +60,14 @@ const HadesUnderworldRoll: React.FC<GameComponentProps & { game: Game }> = ({ go
             setWinResult(playerWins);
 
             const payout = playerWins ? wagerAmount * game.payoutMultiplier : 0;
-            onGameResult(wagerAmount, payout, god.id);
+            onGameResult(wagerAmount, payout, god.id, false, false);
             
             setTimeout(() => setGameState('result'), 500);
         }, 2500);
     };
 
     const handlePlayAgain = () => {
+        audioService.play('click');
         setWagerAmount(game.minBet);
         setGameState('betting');
     };

@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { GameComponentProps } from '../../types';
+// FIX: Corrected import path for types.
+import { GameComponentProps } from '../../src/types';
 import GameWrapper from './GameWrapper';
-import { audioService } from '../../services/audioService';
+import { audioService } from '../../src/services/audioService';
 import * as Icons from '../icons/MythicIcons';
 
 const slotSymbols = [
@@ -90,7 +91,7 @@ const HadesSlots: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameR
 
             if(winAmount === 0) audioService.play('lose');
             setResultMessage(finalMessage);
-            onGameResult(wagerAmount, winAmount, god.id);
+            onGameResult(wagerAmount, winAmount, god.id, false, false);
 
         }, 2000 + REEL_COUNT * 200); // Animation duration
     };

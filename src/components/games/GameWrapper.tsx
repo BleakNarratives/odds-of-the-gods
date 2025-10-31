@@ -1,5 +1,4 @@
 // src/components/games/GameWrapper.tsx
-
 import React from 'react';
 import { God } from '../../types';
 
@@ -12,7 +11,7 @@ const GameWrapper: React.FC<GameWrapperProps> = ({ god, children }) => {
     
     const colorMap: Record<string, string> = {
         amber: '#f59e0b', rose: '#f43f5e', slate: '#64748b', green: '#22c55e',
-        yellow: '#facc15', blue: '#3b82f6', red: '#ef4444', indigo: '#6366f1',
+        yellow: '#facc15', blue: '#2563eb', red: '#ef4444', indigo: '#6366f1',
         teal: '#14b8a6', primary: '#fca311', secondary: '#e5e5e5'
     };
     const primaryColor = colorMap[god.color] || 'var(--color-primary)';

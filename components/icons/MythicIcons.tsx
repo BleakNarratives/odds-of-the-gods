@@ -150,7 +150,6 @@ export const CardsIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-// FIX: Added DevToolsIcon component
 export const DevToolsIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
         <path d="M13.85 22.25h-3.71l-.74-2.46a7.35 7.35 0 0 1-2.22-1.54l-2.61 1.12-1.85-3.21 2.09-1.84a7.17 7.17 0 0 1 0-2.64L2.73 9.61l1.85-3.21 2.61 1.12a7.35 7.35 0 0 1 2.22-1.54l.74-2.46h3.71l.74 2.46a7.35 7.35 0 0 1 2.22 1.54l2.61-1.12 1.85 3.21-2.09 1.84a7.17 7.17 0 0 1 0 2.64l2.09 1.84-1.85 3.21-2.61-1.12a7.35 7.35 0 0 1-2.22 1.54l-.74 2.46zM12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>

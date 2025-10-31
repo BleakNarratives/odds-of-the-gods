@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { GameComponentProps } from '../../types';
+// FIX: Corrected import path for types.
+import { GameComponentProps } from '../../src/types';
 import GameWrapper from './GameWrapper';
-import { audioService } from '../../services/audioService';
+import { audioService } from '../../src/services/audioService';
 
 const AnubisJars: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameResult }) => {
     const [wagerAmount, setWagerAmount] = useState(100);
@@ -35,7 +36,8 @@ const AnubisJars: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameR
         const isWin = jars[index] === 'win';
         const winAmount = isWin ? wagerAmount * 3 : 0;
         
-        onGameResult(wagerAmount, winAmount, god.id);
+        // FIX: Add missing arguments
+        onGameResult(wagerAmount, winAmount, god.id, false, false);
 
         setResultMessage(isWin ? `The Heart is Found! You win ${winAmount.toLocaleString()} Souls!` : "An empty vessel. Your offering is lost.");
         setRevealed([true, true, true]);
@@ -54,6 +56,7 @@ const AnubisJars: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameR
         </svg>
     );
 
+    // FIX: Added return statement with JSX to make this a valid React component.
     return (
         <GameWrapper god={god}>
             <div className="text-center">

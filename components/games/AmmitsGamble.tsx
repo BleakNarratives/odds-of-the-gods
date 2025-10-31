@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { GameComponentProps } from '../../types';
+// FIX: Corrected import path for types.
+import { GameComponentProps } from '../../src/types';
 import GameWrapper from './GameWrapper';
-import { audioService } from '../../services/audioService';
+import { audioService } from '../../src/services/audioService';
 
 const AmmitsGamble: React.FC<GameComponentProps> = ({ god, wager, onWager, onGameResult }) => {
     const [wagerAmount, setWagerAmount] = useState(100);
@@ -49,12 +50,12 @@ const AmmitsGamble: React.FC<GameComponentProps> = ({ god, wager, onWager, onGam
 
         if (newVirtues >= 5) {
             const winAmount = wagerAmount * 2.5;
-            onGameResult(wagerAmount, winAmount, god.id);
+            onGameResult(wagerAmount, winAmount, god.id, false, false);
             setMessage(`Five virtues collected! You win ${winAmount.toLocaleString()} souls!`);
             setGameState('ended');
             audioService.play('win');
         } else if (newSins >= 3) {
-            onGameResult(wagerAmount, 0, god.id);
+            onGameResult(wagerAmount, 0, god.id, false, false);
             setMessage('Three sins... Ammit the Devourer claims your wager!');
             setGameState('ended');
             audioService.play('lose');

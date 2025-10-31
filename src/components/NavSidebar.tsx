@@ -1,111 +1,41 @@
 // src/components/NavSidebar.tsx
-
 import React from 'react';
-import { God, GodId } from '../types';
-import { GAMES } from '../constants';
-import { AspirantIcon } from './icons/MythicIcons';
 
 interface NavSidebarProps {
-  currentGod: God;
-  onNavigateToSanctum: () => void;
-  onNavigateToPantheon: () => void;
-  onNavigateToMortalGames: () => void;
-  onNavigateToDashboard: () => void;
   isOpen: boolean;
   onClose: () => void;
-  activeScreen: 'SANCTUM' | 'GAME' | 'PANTHEON' | 'WAR' | 'MORTAL_GAMES' | 'CLASH' | 'DASHBOARD';
+  onNavigate: (screen: 'pantheon' | 'account' | 'clash') => void;
+  onCashOutClick: () => void;
+  onReplenishClick: () => void;
 }
 
-const NavSidebar: React.FC<NavSidebarProps> = ({ currentGod, onNavigateToSanctum, onNavigateToPantheon, onNavigateToMortalGames, onNavigateToDashboard, isOpen, onClose, activeScreen }) => {
-  const gameForGod = GAMES.find(g => g.godId === currentGod.id);
-  const GodIcon = gameForGod ? gameForGod.Icon : AspirantIcon;
-
-  const colorMap: Record<string, string> = {
-      amber: '#f59e0b', rose: '#f43f5e', slate: '#64748b', green: '#22c55e',
-      yellow: '#facc15', blue: '#3b82f6', red: '#ef4444', indigo: '#6366f1',
-      teal: '#14b8a6', primary: '#fca311', secondary: '#e5e5e5'
-  };
-  const godColorHex = colorMap[currentGod.color] || '#ffffff';
-
-  const getLinkClass = (screen: 'SANCTUM' | 'PANTHEON' | 'MORTAL_GAMES' | 'DASHBOARD') => {
-    const isActive = (activeScreen === 'GAME' && screen === 'SANCTUM') || 
-                     (activeScreen === 'WAR' && screen === 'SANCTUM') || 
-                     (activeScreen === 'CLASH' && screen === 'SANCTUM') || 
-                     activeScreen === screen;
-    return `w-full text-left px-4 py-3 rounded-md transition-colors duration-200 ${
-        isActive
-        ? 'bg-amber-800/70 text-white font-bold'
-        : 'text-slate-300 hover:bg-amber-800/50 hover:text-white'
-    }`;
-  };
-
-  const sidebarContent = (
-    <div className="w-64 bg-black/80 backdrop-blur-lg border-r border-amber-500/10 p-4 flex flex-col h-full">
-        <div className="text-center mb-6">
-          <div className="w-24 h-24 rounded-full mx-auto p-2 border-2" style={{ borderColor: godColorHex }}>
-            <GodIcon className="w-full h-full" style={{ color: godColorHex }} />
-          </div>
-          <h3 className="mt-4 text-xl font-bold text-white">{currentGod.name}</h3>
-          <p className="text-sm text-slate-400">Your Patron</p>
-        </div>
-
-        <ul className="space-y-2">
-          <li>
-            <button
-              onClick={onNavigateToDashboard}
-              className={getLinkClass('DASHBOARD')}
-            >
-              Player Dashboard
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onNavigateToSanctum}
-              className={getLinkClass('SANCTUM')}
-            >
-              Divine Sanctum
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onNavigateToMortalGames}
-              className={getLinkClass('MORTAL_GAMES')}
-            >
-              Mortal's Folly
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onNavigateToPantheon}
-              className={getLinkClass('PANTHEON')}
-            >
-              View Pantheon
-            </button>
-          </li>
-        </ul>
-
-        <div className="mt-auto text-center text-xs text-slate-600">
-          <p>Your choices shape the cosmos.</p>
-        </div>
-    </div>
-  );
-
+const NavSidebar: React.FC<NavSidebarProps> = ({ isOpen, onClose, onNavigate, onCashOutClick, onReplenishClick }) => {
   return (
     <>
-      {/* Mobile Overlay */}
       <div 
-        className={`md:hidden fixed inset-0 z-40 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 bg-black/60 z-[60] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={onClose}
+      />
+      <div
+        className={`fixed top-0 right-0 h-full w-64 bg-slate-900 shadow-2xl z-[70] transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
-        <div className="absolute inset-0 bg-black/60" onClick={onClose}></div>
-        <div className={`relative transition-transform duration-300 h-full ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-          {sidebarContent}
+        <div className="p-4 flex flex-col h-full">
+            <h2 className="text-xl font-bold text-theme-primary mb-8">Navigation</h2>
+            <nav className="flex flex-col space-y-4 flex-grow">
+                <button onClick={() => onNavigate('pantheon')} className="text-left text-lg text-slate-300 hover:text-white transition-colors">The Pantheon</button>
+                <button onClick={() => onNavigate('account')} className="text-left text-lg text-slate-300 hover:text-white transition-colors">Account</button>
+                <button onClick={() => onNavigate('clash')} className="text-left text-lg text-slate-300 hover:text-white transition-colors">Clash of Fates</button>
+            </nav>
+            <div className="space-y-3">
+                 <button onClick={onReplenishClick} className="w-full bg-green-600/80 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-md transition-colors">
+                    Replenish Souls
+                </button>
+                <button onClick={onCashOutClick} className="w-full bg-theme-primary/90 text-theme-background font-bold py-2 px-4 rounded-md hover:bg-theme-primary transition-colors">
+                    Cash Out
+                </button>
+            </div>
         </div>
       </div>
-
-      {/* Desktop Sidebar */}
-      <nav className="hidden md:flex flex-shrink-0 z-20 min-h-[calc(100vh-89px)]">
-         {sidebarContent}
-      </nav>
     </>
   );
 };

@@ -1,6 +1,5 @@
 import React from 'react';
 import { ThothIcon, SoulIcon, ArchitectIcon, DevToolsIcon } from './icons/MythicIcons';
-// FIX: Removed unused import for 'GodId' which was causing a type error.
 
 interface HeaderProps {
   souls: number;

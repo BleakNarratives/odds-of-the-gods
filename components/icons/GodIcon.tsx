@@ -1,4 +1,6 @@
+
 import React from 'react';
+// FIX: Corrected import path for types.
 import { GodId } from '../../types';
 import * as MythicIcons from './MythicIcons';
 
@@ -17,6 +19,8 @@ const GodIcon: React.FC<GodIconProps> = ({ godId, ...props }) => {
         janus: MythicIcons.JanusIcon,
         hecate: MythicIcons.HecateIcon,
         morrigan: MythicIcons.MorriganIcon,
+        // FIX: Added missing sterculius icon to the map.
+        sterculius: MythicIcons.FlyIcon,
         aspirant: MythicIcons.AspirantIcon,
         user_god: MythicIcons.AspirantIcon, // Fallback for user god
     };

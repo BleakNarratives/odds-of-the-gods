@@ -1,7 +1,4 @@
 {
   "name": "Odds of the Gods",
-  "description": "Challenge the ancient gods in a casino where your soul is the currency. Guided by the trickster god Thoth, will you earn eternal glory or fade into myth?",
-  "requestFramePermissions": [
-    "microphone"
-  ]
+  "description": "Challenge the ancient gods in a casino where your soul is the currency. Guided by the trickster god Thoth, will you earn eternal glory or fade into myth?"
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
-import { God } from '../../types';
-import { audioService } from '../../services/audioService';
+// FIX: Corrected import path to be explicitly relative.
+import { God } from '../../src/types';
+import { audioService } from '../../src/services/audioService';
 import * as MythicIcons from '../icons/MythicIcons';
 
 interface GameResultAnimationProps {
@@ -47,5 +48,3 @@ export const GameResultAnimation: React.FC<GameResultAnimationProps> = ({ isWin,
         </div>
     );
 };
-
-export default GameResultAnimation;

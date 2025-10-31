@@ -1,8 +1,10 @@
 import React from 'react';
 import Modal from './Modal';
-import { GodId } from '../../types';
+// FIX: Corrected import path for types.
+import { GodId } from '../../src/types';
 import GodIcon from '../icons/GodIcon';
-import { PANTHEON } from '../../constants';
+// FIX: Corrected import path for constants.
+import { PANTHEON } from '../../src/constants';
 
 
 interface EquiNexModalProps {
